@@ -3,7 +3,8 @@ const path = require('path');
 
 const PDFDocument = require('pdfkit');
 
-const stripe = require('stripe')(process.env.STRIPE_API);
+const Stripe = require('stripe');
+const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY);
 const Product = require('../models/product');
 const Order = require('../models/order');
 
@@ -63,6 +64,7 @@ exports.getCart = (req, res, next) => {
     .populate('cart.items.productId')
     .then((userData) => {
       const products = userData.cart.items;
+
       products.forEach((p) => {
         total += p.quantity * p.productId.price;
       });

@@ -1,6 +1,7 @@
 const path = require('path');
 
 const express = require('express');
+const dotenv = require('dotenv').config();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
@@ -9,7 +10,6 @@ const csrf = require('csurf');
 const flash = require('connect-flash');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
-const dotenv = require('dotenv');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -18,7 +18,6 @@ const errorController = require('./controller/error');
 const User = require('./models/user');
 
 const app = express();
-dotenv.config();
 const store = new MongoSBStore({
   uri: process.env.MONGO_URI,
   collection: 'sessions',
