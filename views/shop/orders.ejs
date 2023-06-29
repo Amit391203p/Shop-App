@@ -1,0 +1,35 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/orders.css">
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+        <main>
+            <% if (orders.length <= 0) { %>
+                <h1>Nothing there!</h1>
+            <% } else { %>
+                <ul class="orders">
+                    <% orders.forEach(order => { %>
+                        <li class="orders__item">
+                            <div class="orders_item_heading">
+                            <h1>Order - # <%= order._id %>  <a class="btn" href="/orders/<%=order._id%>">Invoice</a>
+                            </h1>
+                            <h1>Total: ₹<%=order.totalAmount%>
+                               
+                            </h1>
+                        </div>
+                            <ul class="orders__products">
+                                <% order.products.forEach(p => { %>
+                                    <li class="orders__products-item">
+                                        <p><%= p.product.title %> </p>
+                                        <p><%= p.quantity %> x ₹<%= p.product.price %></p>
+                                        <p>₹ <%= (p.product.price* p.quantity).toFixed(2) %></p>
+                                    </li>
+                                <% }); %>
+                            </ul>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } %>
+        </main>
+        <%- include('../includes/end.ejs') %>
