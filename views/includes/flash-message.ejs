@@ -1,0 +1,5 @@
+<% if(locals.messages.error) {%>
+<div class="user-message user-message--error"><%=messages.error[0]%></div>
+<% }else if (locals.messages.success) {%>
+<div class="user-message user-message--success"><%=messages.success[0]%></div>
+<% }%>

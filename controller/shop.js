@@ -122,6 +122,7 @@ exports.getOrders = (req, res) => {
   Order.find({
     'user.userId': req.user._id,
   })
+    .sort({ createdAt: -1 })
     .then((orders) => {
       res.render('shop/orders', {
         pageTitle: 'Orders',
@@ -156,7 +157,6 @@ exports.getCheckout = async (req, res, next) => {
             unit_amount: p.productId.price * 100,
             product_data: {
               name: p.productId.title,
-              description: p.productId.description,
             },
           },
           quantity: p.quantity,

@@ -254,6 +254,11 @@ form {
   background: rgb(255, 176, 176);
   color: red;
 }
+.user-message--success {
+  border-color: green;
+  background: rgb(175, 230, 175);
+  color: green;
+}
 
 .pagination {
   margin-top: 2rem;

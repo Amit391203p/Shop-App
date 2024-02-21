@@ -52,7 +52,7 @@ exports.postAddProduct = (req, res, next) => {
       validationErrors: [],
     });
   }
-  const imageUrl = image.path.replace('\\', '/');
+  const imageUrl = image.filename;
 
   if (!errors.isEmpty()) {
     return res.status(422).render('admin/edit-product', {
@@ -63,7 +63,6 @@ exports.postAddProduct = (req, res, next) => {
       errorMessage: errors.array()[0].msg,
       product: {
         title: title,
-        imageUrl: imageUrl,
         description: description,
         price: price,
       },
@@ -152,9 +151,9 @@ exports.postEditProduct = (req, res, next) => {
       product.description = updatedDescription;
       if (image) {
         fileHelper.deleteFile(product.imageUrl);
-        product.imageUrl = image.path.replace('\\', '/');
+        product.imageUrl = image.filename;
       }
-      return product.save().then((result) => {
+      return product.save().then(() => {
         res.redirect('/admin/products');
       });
     })
@@ -167,12 +166,14 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.deleteProduct = (req, res, next) => {
   const productId = req.params.productId;
+
   Product.findById(productId)
     .then((product) => {
       if (!product) {
         return next(new Error('Product not found'));
       }
       fileHelper.deleteFile(product.imageUrl);
+      req.user.removeFromCart(productId);
       return Product.deleteOne({ _id: productId, userId: req.user._id });
     })
     .then(() => {

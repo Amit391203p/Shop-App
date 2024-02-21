@@ -55,6 +55,7 @@ userSchema.methods.addToCart = function (product) {
 };
 
 userSchema.methods.removeFromCart = function (productId) {
+  console.log(productId, 'asas');
   const updatedCartItems = this.cart.items.filter((i) => {
     return i.productId.toString() !== productId.toString();
   });

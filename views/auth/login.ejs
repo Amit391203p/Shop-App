@@ -7,11 +7,10 @@
    <%- include('../includes/navigation.ejs') %>
 
     <main>
-        <% if(errorMessage){ %>
-            <div class="user-message user-message--error">
-                <%=errorMessage%>
-            </div>
-            <% } %>
+       <%- include('../includes/flash-message.ejs') %>
+       <%if(errorMessage) {%>
+       <div class="user-message user-message--error"><%=errorMessage%></div>
+       <% } %>
         <form class="login-form" action="/login" method="POST" novalidate>
             <div class="form-control">
                 <label for="email">E-Mail</label>

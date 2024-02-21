@@ -6,7 +6,7 @@ const { validationResult } = require('express-validator');
 
 const User = require('../models/user');
 
-var transporter = nodemailer.createTransport({
+let transporter = nodemailer.createTransport({
   host: process.env.MAILTRAP_HOST,
   port: process.env.MAILTRAP_PORT,
   auth: {
@@ -15,44 +15,31 @@ var transporter = nodemailer.createTransport({
   },
 });
 
-exports.getLogin = (req, res, next) => {
-  let message = req.flash('error');
-  if (message.length > 0) {
-    message = message[0];
-  } else {
-    message = null;
-  }
-
+exports.getLogin = (req, res) => {
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
     isAuthenticated: false,
-    errorMessage: message,
     oldInput: {
       email: '',
       password: '',
     },
+    errorMessage: null,
     validationErrors: [],
   });
 };
 
 exports.getSignup = (req, res) => {
-  let message = req.flash('error');
-  if (message.length > 0) {
-    message = message[0];
-  } else {
-    message = null;
-  }
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
     isAuthenticated: false,
-    errorMessage: message,
     oldInput: {
       email: '',
       password: '',
       confirmPassword: '',
     },
+    errorMessage: null,
     validationErrors: [],
   });
 };
@@ -82,7 +69,7 @@ exports.postLogin = (req, res, next) => {
           path: '/login',
           pageTitle: 'Login',
           isAuthenticated: false,
-          errorMessage: 'Invalid email or password',
+          errorMessage: 'Email does not exists',
           oldInput: {
             email: email,
             password: password,
@@ -102,7 +89,7 @@ exports.postLogin = (req, res, next) => {
           path: '/login',
           pageTitle: 'Login',
           isAuthenticated: false,
-          errorMessage: 'Invalid email or password',
+          errorMessage: 'Invalid password',
           oldInput: {
             email: email,
             password: password,
@@ -153,9 +140,11 @@ exports.postSignup = (req, res, next) => {
       return user.save();
     })
     .then(() => {
+      req.flash('success', 'Account created successfully , Login now');
       res.redirect('/login');
-      transporter.sendMail({
-        from: '"Amit Phogat" <sandbox.smtp.mailtrap.io>',
+
+      return transporter.sendMail({
+        from: '"Ecommerce Website" <from@ecommerce.com>',
         to: email,
         subject: 'Signup Successful!',
         text: 'You have signed up successfully!',
@@ -175,17 +164,10 @@ exports.postLogout = (req, res) => {
 };
 
 exports.getReset = (req, res) => {
-  let message = req.flash('error');
-  if (message.length > 0) {
-    message = message[0];
-  } else {
-    message = null;
-  }
   res.render('auth/reset', {
     path: '/reset',
     pageTitle: 'Reset Password',
     isAuthenticated: false,
-    errorMessage: message,
   });
 };
 
@@ -207,10 +189,11 @@ exports.postReset = (req, res, next) => {
         return user.save();
       })
       .then(() => {
+        req.flash('success', 'Sent an email to reset password');
         res.redirect('/login');
         transporter.sendMail({
           to: req.body.email,
-          from: '"Amit Phogat" <sandbox.smtp.mailtrap.io>',
+          from: '"Ecommerce Website" <from@ecommerce.com>',
           subject: 'Password Reset',
           html: `
           <p>You requested for password reset</p>
@@ -227,12 +210,6 @@ exports.postReset = (req, res, next) => {
 };
 
 exports.getNewPassword = (req, res, next) => {
-  let message = req.flash('error');
-  if (message.length > 0) {
-    message = message[0];
-  } else {
-    message = null;
-  }
   const token = req.params.token;
 
   User.findOne({
@@ -249,9 +226,9 @@ exports.getNewPassword = (req, res, next) => {
         path: '/new-password',
         pageTitle: 'New Password',
         isAuthenticated: false,
-        errorMessage: message,
         userId: user._id.toString(),
         resetToken: token,
+        errorMessage: null,
       });
     })
     .catch((err) => {
@@ -266,6 +243,17 @@ exports.postNewPassword = (req, res, next) => {
   const newPassword = req.body.password;
   let updatedUser;
   const resetToken = req.body.resetToken;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render('auth/new-password', {
+      path: '/new-password',
+      pageTitle: 'New Password',
+      isAuthenticated: false,
+      userId: userId,
+      resetToken: resetToken,
+      errorMessage: errors.array()[0].msg,
+    });
+  }
 
   User.findOne({
     _id: userId,
@@ -273,6 +261,10 @@ exports.postNewPassword = (req, res, next) => {
     resetTokenExpiration: { $gt: Date.now() },
   })
     .then((user) => {
+      if (!user) {
+        req.flash('error', 'Reset link expired');
+        return res.redirect('/reset');
+      }
       updatedUser = user;
       return bcrypt.hash(newPassword, 12);
     })
@@ -283,6 +275,7 @@ exports.postNewPassword = (req, res, next) => {
       return updatedUser.save();
     })
     .then(() => {
+      req.flash('success', 'Password updated successfully');
       res.redirect('/login');
     })
     .catch((err) => {

@@ -1,26 +1,22 @@
 const express = require('express');
-const { check, body } = require('express-validator');
+const { body } = require('express-validator');
 
 const authController = require('../controller/auth');
 const User = require('../models/user');
-
+const isLogged = require('../middlewares/is-logged');
 const router = express.Router();
 
-router.get('/login', authController.getLogin);
+router.get('/login', isLogged, authController.getLogin);
 
-router.get('/signup', authController.getSignup);
+router.get('/signup', isLogged, authController.getSignup);
 
 router.post(
   '/login',
   [
-    body('email')
-      .isEmail()
-      .withMessage('Please enter a valid email address')
-      .normalizeEmail(),
-    body('password', 'Password has to be valid')
-      .isLength({ min: 5 })
-      .isAlphanumeric()
-      .trim(),
+    body('email').isEmail().withMessage('Please enter a valid email address'),
+    body('password', 'Password must have min 5 characters')
+      .trim()
+      .isLength({ min: 5 }),
   ],
   authController.postLogin
 );
@@ -31,7 +27,7 @@ router.post(
     body('name')
       .trim()
       .isLength({ min: 3 })
-      .withMessage('Name should have at least 3 characters'),
+      .withMessage('Name must have min 5 characters'),
     body('email')
       .isEmail()
       .withMessage('Please enter a valid email')
@@ -41,16 +37,10 @@ router.post(
             return Promise.reject('Email already exists ,pick a different one');
           }
         });
-      })
-      .normalizeEmail(),
-
-    body(
-      'password',
-      'Please enter a password with numbers and text and at least 5 characters long'
-    )
+      }),
+    body('password', 'Password must have min 5 characters')
       .trim()
-      .isLength({ min: 5 })
-      .isAlphanumeric(),
+      .isLength({ min: 5 }),
     body('confirmPassword')
       .trim()
       .custom((value, { req }) => {
@@ -65,12 +55,18 @@ router.post(
 
 router.post('/logout', authController.postLogout);
 
-router.get('/reset', authController.getReset);
+router.get('/reset', isLogged, authController.getReset);
 
 router.post('/reset', authController.postReset);
 
-router.get('/reset/:token', authController.getNewPassword);
+router.get('/reset/:token', isLogged, authController.getNewPassword);
 
-router.post('/new-password', authController.postNewPassword);
+router.post(
+  '/new-password',
+  body('password', 'Password must have min 5 characters')
+    .trim()
+    .isLength({ min: 5 }),
+  authController.postNewPassword
+);
 
 module.exports = router;

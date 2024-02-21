@@ -7,11 +7,8 @@
    <%- include('../includes/navigation.ejs') %>
 
     <main>
-        <% if(errorMessage){ %>
-            <div class="user-message user-message--error">
-                <%=errorMessage%>
-            </div>
-            <% } %>
+        <%- include('../includes/flash-message.ejs') %>
+
         <form class="login-form" action="/reset" method="POST">
             <div class="form-control">
                 <label for="email">E-Mail</label>

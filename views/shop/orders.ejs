@@ -12,8 +12,11 @@
                     <% orders.forEach(order => { %>
                         <li class="orders__item">
                             <div class="orders_item_heading">
-                            <h1>Order - # <%= order._id %>  <a class="btn" href="/orders/<%=order._id%>">Invoice</a>
-                            </h1>
+                                <div >
+                                    <h1>Order - # <%= order._id %>  <a class="btn" href="/orders/<%=order._id%>">Invoice</a>
+                                    </h1>
+                                    <h1>(<%= order.createdAt.toLocaleString() %>)</h1>
+                                </div>
                             <h1>Total: ₹<%=order.totalAmount%>
                                
                             </h1>

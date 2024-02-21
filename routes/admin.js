@@ -12,7 +12,7 @@ router.post(
   '/add-product',
   [
     body('title').trim().isString().isLength({ min: 3 }),
-    body('price').isFloat(),
+    body('price').isFloat({ min: 1 }),
     body('description').trim().isLength({ min: 5, max: 500 }),
   ],
   isAuth,
@@ -27,7 +27,7 @@ router.post(
   '/edit-product',
   [
     body('title').isString().isLength({ min: 3 }).trim(),
-    body('price').isFloat(),
+    body('price').isFloat({ min: 1 }),
     body('description').isLength({ min: 5, max: 500 }).trim(),
   ],
   isAuth,

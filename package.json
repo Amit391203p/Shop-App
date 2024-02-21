@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.4.4",
     "nodemon": "^2.0.22"
   },
   "dependencies": {
@@ -25,11 +25,10 @@
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
     "mailtrap": "^3.1.1",
-    "mongodb": "^5.6.0",
+    "mongodb": "^5.9.2",
     "mongoose": "^7.2.4",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.3",
-    "nodemailer-sendgrid-transport": "^0.2.0",
     "pdfkit": "^0.13.0",
     "stripe": "^12.9.0",
     "uuid": "^9.0.0"
